@@ -19,7 +19,7 @@
         class="result"
         @click="setResult(result)"
       >
-        {{ result }}
+        {{ result.name }}
       </li>
     </ul>
   </div>
@@ -27,6 +27,7 @@
 
 <script>
 import axios from 'axios'
+import _ from 'lodash'
 
 export default {
   name: 'RepoSearch',
@@ -50,16 +51,24 @@ export default {
       if (this.search == '') {
         this.isOpen = false
       } else {
-        this.getReposFromGithub(this.search);
+        this.getReposFromGithub(this);
         this.isOpen = true;
         this.filterResults();
       }
     },
-    getReposFromGithub(query) {
-      axios
-        .get('https://api.github.com/search/repositories?q=' + query)
-        .then(response => (console.log(response.data.items)))
-    },
+    getReposFromGithub: _.debounce((context) => {
+      if (context.search != '') {
+        axios
+          .get('https://api.github.com/search/repositories?q=' + context.search)
+          .then(response => (
+            context.results = response.data.items.map(item => ({"id": item.id, "name": item.full_name }))
+          ))
+          .catch(error => {
+            console.log(error.response)
+          });
+      }
+    }, 350),
+
     filterResults() {
       this.results = this.items.filter(item => item.toLowerCase().indexOf(this.search.toLowerCase()) > -1);
     },
@@ -67,7 +76,7 @@ export default {
       this.isOpen = false;
     },
     setResult(result) {
-      this.search = result;
+      this.search = result.name;
       console.log(result)
       this.isOpen = false;
     },
