@@ -1,16 +1,16 @@
 <template>
   <div id="app">
-    <HelloWorld :items="['Bitcoin', 'Ethereum', 'Dogecoin']"/>
+    <RepoSearch :items="['Bitcoin', 'Ethereum', 'Dogecoin']"/>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import RepoSearch from './components/RepoSearch.vue'
 
 export default {
   name: 'app',
   components: {
-    HelloWorld
+    RepoSearch
   }
 }
 </script>

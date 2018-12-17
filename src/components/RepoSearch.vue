@@ -13,7 +13,12 @@
       class="results"
       v-show="isOpen"
     >
-      <li v-for="(result, i) in results" :key="i" class="result">
+      <li 
+        v-for="(result, i) in results" 
+        :key="i" 
+        class="result"
+        @click="setResult(result)"
+      >
         {{ result }}
       </li>
     </ul>
@@ -21,8 +26,10 @@
 </template>
 
 <script>
+import axios from 'axios'
+
 export default {
-  name: 'HelloWorld',
+  name: 'RepoSearch',
   props: {
     items: {
       type: Array,
@@ -39,19 +46,31 @@ export default {
   },
   methods: {
     onChange() { 
+      this.results = []
       if (this.search == '') {
         this.isOpen = false
       } else {
+        this.getReposFromGithub(this.search);
         this.isOpen = true;
         this.filterResults();
       }
+    },
+    getReposFromGithub(query) {
+      axios
+        .get('https://api.github.com/search/repositories?q=' + query)
+        .then(response => (console.log(response.data.items)))
     },
     filterResults() {
       this.results = this.items.filter(item => item.toLowerCase().indexOf(this.search.toLowerCase()) > -1);
     },
     hideResults() {
       this.isOpen = false;
-    }
+    },
+    setResult(result) {
+      this.search = result;
+      console.log(result)
+      this.isOpen = false;
+    },
   },
 }
 </script>
